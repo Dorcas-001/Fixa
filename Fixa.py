@@ -9,13 +9,13 @@ from datetime import datetime
 
 st.set_page_config(
     page_title="Eden Care ProActiv Dashboard",
-    page_icon=Image.open("EC_logoo.png"),
+    page_icon=Image.open("Fixa (2).png"),
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # SIDEBAR FILTER
-logo_url = 'EC_logo.png'  
+logo_url = 'Fixa (2) - Copy.png'  
 st.sidebar.image(logo_url, use_column_width=True)
 
 page = st.sidebar.selectbox("Choose a dashboard view", ["Home", "Members Demographic View", "Members Behaviour View", "Members Income View"])
