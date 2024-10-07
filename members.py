@@ -865,32 +865,29 @@ if not filtered_df.empty:
     # Sort the DataFrame by the 'YearMonth' index
     monthly_onboarded = monthly_onboarded.sort_index()
 
-    # Define custom colors
-    custom_colors = ["#006E7F", "#e66c37", "#B4B4B8", "#f8a785"]
+    with clus2:
+        # Create the bar chart
+        fig_monthly_onboarded = go.Figure()
 
-    # Create the bar chart
-    fig_monthly_onboarded = go.Figure()
+        fig_monthly_onboarded.add_trace(go.Bar(
+            x=monthly_onboarded.index,
+            y=monthly_onboarded.values,
+            text=monthly_onboarded.values,
+            textposition='inside',
+            textfont=dict(color='white'),
+            hoverinfo='x+y',
+            marker_color=custom_colors[0]
+        ))
 
-    fig_monthly_onboarded.add_trace(go.Bar(
-        x=monthly_onboarded.index,
-        y=monthly_onboarded.values,
-        text=monthly_onboarded.values,
-        textposition='inside',
-        textfont=dict(color='white'),
-        hoverinfo='x+y',
-        marker_color=custom_colors[0]
-    ))
+        fig_monthly_onboarded.update_layout(
+            xaxis_title="Month",
+            yaxis_title="Number of Workers",
+            font=dict(color='Black'),
+            xaxis=dict(title_font=dict(size=14), tickfont=dict(size=12)),
+            yaxis=dict(title_font=dict(size=14), tickfont=dict(size=12)),
+            margin=dict(l=0, r=0, t=30, b=50)
+        )
 
-    fig_monthly_onboarded.update_layout(
-        title="Monthly Onboarded Workers",
-        xaxis_title="Month",
-        yaxis_title="Number of Workers",
-        font=dict(color='Black'),
-        xaxis=dict(title_font=dict(size=14), tickfont=dict(size=12)),
-        yaxis=dict(title_font=dict(size=14), tickfont=dict(size=12)),
-        margin=dict(l=0, r=0, t=30, b=50)
-    )
-
-    # Display the chart in Streamlit
-    st.markdown('<h2 class="custom-subheader">Monthly Onboarded Workers</h2>', unsafe_allow_html=True)
-    st.plotly_chart(fig_monthly_onboarded, use_container_width=True)
+        # Display the chart in Streamlit
+        st.markdown('<h2 class="custom-subheader">Monthly Onboarded Workers</h2>', unsafe_allow_html=True)
+        st.plotly_chart(fig_monthly_onboarded, use_container_width=True)
