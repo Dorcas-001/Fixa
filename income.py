@@ -56,7 +56,7 @@ st.markdown('''
     </style>
 ''', unsafe_allow_html=True)
 # Your Streamlit app content
-st.markdown('<h2 class = "main-title">WORKFORCE HEALTH AND INSURANCE BEHAVIOUR VIEW</h2>', unsafe_allow_html=True)
+st.markdown('<h2 class = "main-title">WORKFORCE INCOME VIEW</h2>', unsafe_allow_html=True)
 
 
 # Define colors to match the image
@@ -417,12 +417,12 @@ if not filtered_df.empty:
     cols1, cols2 = st.columns(2)
 
 # Count the occurrences of each Status
-    insurance_counts = df["Have the workers had insurance coverage before?"].value_counts().reset_index()
+    insurance_counts = df["Monthly Income Range"].value_counts().reset_index()
     insurance_counts.columns = ["insurrance", "Count"]
 
     with cols1:
         # Display the header
-        st.markdown('<h3 class="custom-subheader">Insurance Status of Worforce</h3>', unsafe_allow_html=True)
+        st.markdown('<h3 class="custom-subheader">Workers Income Range</h3>', unsafe_allow_html=True)
 
         # Create a donut chart
         fig = px.pie(insurance_counts, names="insurrance", values="Count", hole=0.5, template="plotly_dark", color_discrete_sequence=custom_colors)
@@ -432,103 +432,128 @@ if not filtered_df.empty:
         # Display the chart in Streamlit
         st.plotly_chart(fig, use_container_width=True)
 
-# Count the occurrences of each Status
-    health_counts = df["Are there any known health conditionswn health conditions or special needs among the dependents or the worker?"].value_counts().reset_index()
-    health_counts.columns = ["health", "Count"]
+
+    # Group data by 'Worker age range' and 'Educational Background' and calculate the average income
+    grouped_df = df.groupby(['Worker age range', 'Educational Background'])['Average Monthly Income'].mean().unstack().fillna(0)
+
+    # Format the average income to one decimal place
+    grouped_df = grouped_df.applymap(lambda x: round(x, 1))
+
 
     with cols2:
-        # Display the header
-        st.markdown('<h3 class="custom-subheader">Health Conditions of Worforce</h3>', unsafe_allow_html=True)
+        fig_income_age_edu = go.Figure()
 
-        # Create a donut chart
-        fig = px.pie(health_counts, names="health", values="Count", hole=0.5, template="plotly_dark", color_discrete_sequence=custom_colors)
-        fig.update_traces(textposition='inside', textinfo='value+percent')
-        fig.update_layout(height=450, margin=dict(l=0, r=10, t=30, b=50))
+        # Add a bar trace for each educational background
+        for idx, edu_background in enumerate(grouped_df.columns):
+            fig_income_age_edu.add_trace(go.Bar(
+                x=grouped_df.index,
+                y=grouped_df[edu_background],
+                name=edu_background,
+                text=grouped_df[edu_background].apply(lambda x: f'{x:.1f}'),
+                textposition='inside',
+                textfont=dict(color='white'),
+                hoverinfo='x+y+name',
+                marker_color=custom_colors[idx % len(custom_colors)]  # Cycle through custom colors
+            ))
 
-        # Display the chart in Streamlit
-        st.plotly_chart(fig, use_container_width=True)
+        # Set layout for the Income vs Age Range and Educational Background chart
+        fig_income_age_edu.update_layout(
+            xaxis_title="Worker Age Range",
+            yaxis_title="Average Monthly Income",
+            barmode='group',  # Group bars together
+            font=dict(color='Black'),
+            xaxis=dict(title_font=dict(size=14), tickfont=dict(size=12)),
+            yaxis=dict(title_font=dict(size=12), tickfont=dict(size=12)),
+            margin=dict(l=0, r=0, t=30, b=50),
+        )
 
+        # Display the Income vs Age Range and Educational Background chart in Streamlit
+        st.markdown('<h3 class="custom-subheader">Average Monthly Income by Worker Age Range and Educational Background</h3>', unsafe_allow_html=True)
+        st.plotly_chart(fig_income_age_edu, use_container_width=True)
+        
     cols1, cols2 = st.columns(2)
 
-# Count the occurrences of each Status
-    providers_counts = df["Workers Interest in Insurance Products"].value_counts().reset_index()
-    providers_counts.columns = ["providers", "Count"]
+    # Group data by 'Worker age range' and 'Gender' and calculate the average income
+    grouped_df = df.groupby(['Worker age range', 'Gender'])['Average Monthly Income'].mean().unstack().fillna(0)
+
+    # Format the average income to one decimal place
+    grouped_df = grouped_df.applymap(lambda x: round(x, 1))
 
     with cols1:
-        # Display the header
-        st.markdown('<h3 class="custom-subheader">Workeres Prefered Insurance Products</h3>', unsafe_allow_html=True)
+        fig_income_gender_age = go.Figure()
 
-        # Create a donut chart
-        fig = px.pie(providers_counts, names="providers", values="Count", hole=0.5, template="plotly_dark", color_discrete_sequence=custom_colors)
-        fig.update_traces(textposition='inside', textinfo='value+percent')
-        fig.update_layout(height=450, margin=dict(l=0, r=10, t=30, b=50))
+        # Add a bar trace for each gender
+        for idx, gender in enumerate(grouped_df.columns):
+            fig_income_gender_age.add_trace(go.Bar(
+                x=grouped_df.index,
+                y=grouped_df[gender],
+                name=gender,
+                text=grouped_df[gender].apply(lambda x: f'{x:.1f}'),
+                textposition='inside',
+                textfont=dict(color='white'),
+                hoverinfo='x+y+name',
+                marker_color=custom_colors[idx % len(custom_colors)]  # Cycle through custom colors
+            ))
 
-        # Display the chart in Streamlit
-        st.plotly_chart(fig, use_container_width=True)
-
-# Count the occurrences of each Status
-    coverage_counts = df["What type of coverage is most important?"].value_counts().reset_index()
-    coverage_counts.columns = ["coverage", "Count"]
-
-    with cols2:
-        # Display the header
-        st.markdown('<h3 class="custom-subheader">Workers Prefered Coverage</h3>', unsafe_allow_html=True)
-
-        # Create a donut chart
-        fig = px.pie(coverage_counts, names="coverage", values="Count", hole=0.5, template="plotly_dark", color_discrete_sequence=custom_colors)
-        fig.update_traces(textposition='inside', textinfo='value+percent')
-        fig.update_layout(height=450, margin=dict(l=0, r=10, t=30, b=50))
-
-        # Display the chart in Streamlit
-        st.plotly_chart(fig, use_container_width=True)
-
-    # Count the occurrences of each Status
-    coverage_counts = df["Saving behaviour"].value_counts().reset_index()
-    coverage_counts.columns = ["coverage", "Count"]
-
-    with cols1:
-        # Display the header
-        st.markdown('<h3 class="custom-subheader">Saving Behaviour of Workers</h3>', unsafe_allow_html=True)
-
-        # Create a bar chart
-        fig = px.bar(coverage_counts, x="coverage", y="Count", text="Count", template="plotly_white", color_discrete_sequence=custom_colors)
-        fig.update_traces(textposition='inside', textfont=dict(color='white'))
-        fig.update_layout(
-            xaxis_title="Saving Behaviour",
-            yaxis_title="Number of workers",
-            height=450,
-            margin=dict(l=0, r=10, t=30, b=50)
+        # Set layout for the Income vs Gender and Age Range chart
+        fig_income_gender_age.update_layout(
+            xaxis_title="Worker Age Range",
+            yaxis_title="Average Monthly Income",
+            barmode='group',  # Group bars together
+            font=dict(color='Black'),
+            xaxis=dict(title_font=dict(size=14), tickfont=dict(size=12)),
+            yaxis=dict(title_font=dict(size=12), tickfont=dict(size=12)),
+            margin=dict(l=0, r=0, t=30, b=50),
         )
 
-        # Display the chart in Streamlit
-        st.plotly_chart(fig, use_container_width=True)
+        # Display the Income vs Gender and Age Range chart in Streamlit
+        st.markdown('<h3 class="custom-subheader">Average Monthly Income by Gender and Worker Age Range</h3>', unsafe_allow_html=True)
+        st.plotly_chart(fig_income_gender_age, use_container_width=True)
 
-    # Count the occurrences of each Status
-    coverage_counts = df["What type of phone does the worker currently use?"].value_counts().reset_index()
-    coverage_counts.columns = ["phone", "Count"]
+
+    # Group data by 'Worker age range' and 'Skilled or Unskilled worker' and calculate the average income
+    grouped_df = df.groupby(['Worker age range', 'Skilled or Unskilled worker'])['Average Monthly Income'].mean().unstack().fillna(0)
+
+    # Format the average income to one decimal place
+    grouped_df = grouped_df.applymap(lambda x: round(x, 1))
 
     with cols2:
-        # Display the header
-        st.markdown('<h3 class="custom-subheader">Workers Communication Device</h3>', unsafe_allow_html=True)
+        fig_income_skill_age = go.Figure()
 
-        # Create a bar chart
-        fig = px.bar(coverage_counts, x="phone", y="Count", text="Count", template="plotly_white",color_discrete_sequence=custom_colors)
-        fig.update_traces(textposition='inside', textfont=dict(color='white'))
-        fig.update_layout(
-            xaxis_title="Communication Device",
-            yaxis_title="Number of workers",
-            height=450,
-            margin=dict(l=0, r=10, t=30, b=50)
+        # Add a bar trace for each worker type
+        for idx, worker_type in enumerate(grouped_df.columns):
+            fig_income_skill_age.add_trace(go.Bar(
+                x=grouped_df.index,
+                y=grouped_df[worker_type],
+                name=worker_type,
+                text=grouped_df[worker_type].apply(lambda x: f'{x:.1f}'),
+                textposition='inside',
+                textfont=dict(color='white'),
+                hoverinfo='x+y+name',
+                marker_color=custom_colors[idx % len(custom_colors)]  # Cycle through custom colors
+            ))
+
+        # Set layout for the Income vs Worker Skill and Age Range chart
+        fig_income_skill_age.update_layout(
+            xaxis_title="Worker Age Range",
+            yaxis_title="Average Monthly Income",
+            barmode='group',  # Group bars together
+            font=dict(color='Black'),
+            xaxis=dict(title_font=dict(size=14), tickfont=dict(size=12)),
+            yaxis=dict(title_font=dict(size=12), tickfont=dict(size=12)),
+            margin=dict(l=0, r=0, t=30, b=50),
         )
 
-        # Display the chart in Streamlit
-        st.plotly_chart(fig, use_container_width=True)
+        # Display the Income vs Worker Skill and Age Range chart in Streamlit
+        st.markdown('<h3 class="custom-subheader">Average Monthly Income by Worker Skill and Age Range</h3>', unsafe_allow_html=True)
+        st.plotly_chart(fig_income_skill_age, use_container_width=True)
+
 
 # Count the occurrences of each Status
-    coverage_counts = df["How frequently can the workers afford to pay premiums (monthly, quarterly, annually)?"].value_counts().reset_index()
+    coverage_counts = df.groupby('Marital Status')['Average Monthly Income'].mean().reset_index()
     coverage_counts.columns = ["premiums", "Count"]
 
-    with cols2:
+    with cols1:
         # Display the header
         st.markdown('<h3 class="custom-subheader">Workers Affordability Payment Frequency</h3>', unsafe_allow_html=True)
 
@@ -540,23 +565,40 @@ if not filtered_df.empty:
         # Display the chart in Streamlit
         st.plotly_chart(fig, use_container_width=True)
 
-    # Count the occurrences of each Status
-    coverage_counts = df["Preferred mode of communication"].value_counts().reset_index()
-    coverage_counts.columns = ["coverage", "Count"]
+    # Group data by 'Worker age range' and 'Marital Status' and calculate the average income
+    grouped_df = df.groupby(['Worker age range', 'Marital Status'])['Average Monthly Income'].mean().unstack().fillna(0)
 
-    with cols1:
-        # Display the header
-        st.markdown('<h3 class="custom-subheader">Workers Prefered Mode of Communication</h3>', unsafe_allow_html=True)
+    # Format the average income to one decimal place
+    grouped_df = grouped_df.applymap(lambda x: round(x, 1))
 
-        # Create a bar chart
-        fig = px.bar(coverage_counts, x="coverage", y="Count", text="Count", template="plotly_white", color_discrete_sequence=custom_colors)
-        fig.update_traces(textposition='inside', textfont=dict(color='white'))
-        fig.update_layout(
-            xaxis_title="Mode of communication",
-            yaxis_title="Number of workers",
-            height=450,
-            margin=dict(l=0, r=10, t=30, b=50)
+    with cols2:
+        fig_income_marital_age = go.Figure()
+
+        # Add a bar trace for each marital status
+        for idx, marital_status in enumerate(grouped_df.columns):
+            fig_income_marital_age.add_trace(go.Bar(
+                x=grouped_df.index,
+                y=grouped_df[marital_status],
+                name=marital_status,
+                text=grouped_df[marital_status].apply(lambda x: f'{x:.1f}'),
+                textposition='inside',
+                textfont=dict(color='white'),
+                hoverinfo='x+y+name',
+                marker_color=custom_colors[idx % len(custom_colors)]  # Cycle through custom colors
+            ))
+
+        # Set layout for the Income vs Marital Status and Age Range chart
+        fig_income_marital_age.update_layout(
+            title='Average Monthly Income by Marital Status and Age Range',
+            xaxis_title="Worker Age Range",
+            yaxis_title="Average Monthly Income",
+            barmode='group',  # Group bars together
+            font=dict(color='Black'),
+            xaxis=dict(title_font=dict(size=14), tickfont=dict(size=12)),
+            yaxis=dict(title_font=dict(size=12), tickfont=dict(size=12)),
+            margin=dict(l=0, r=0, t=30, b=50),
         )
 
-        # Display the chart in Streamlit
-        st.plotly_chart(fig, use_container_width=True)
+        # Display the Income vs Marital Status and Age Range chart in Streamlit
+        st.markdown('<h3 class="custom-subheader">Average Monthly Income by Marital Status and Age Range</h3>', unsafe_allow_html=True)
+        st.plotly_chart(fig_income_marital_age, use_container_width=True)
