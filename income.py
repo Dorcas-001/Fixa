@@ -589,7 +589,6 @@ if not filtered_df.empty:
 
         # Set layout for the Income vs Marital Status and Age Range chart
         fig_income_marital_age.update_layout(
-            title='Average Monthly Income by Marital Status and Age Range',
             xaxis_title="Worker Age Range",
             yaxis_title="Average Monthly Income",
             barmode='group',  # Group bars together
