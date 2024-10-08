@@ -555,7 +555,7 @@ if not filtered_df.empty:
 
     with cols1:
         # Display the header
-        st.markdown('<h3 class="custom-subheader">Workers Affordability Payment Frequency</h3>', unsafe_allow_html=True)
+        st.markdown('<h3 class="custom-subheader">Workers Average Income by Marital Status</h3>', unsafe_allow_html=True)
 
         # Create a donut chart
         fig = px.pie(coverage_counts, names="premiums", values="Count", hole=0.5, template="plotly_dark", color_discrete_sequence=custom_colors)
